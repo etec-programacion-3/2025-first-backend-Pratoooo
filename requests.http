@@ -1,0 +1,32 @@
+### Crear libro
+POST http://127.0.0.1:8000/libros
+Content-Type: application/json
+
+{
+  "titulo": "El Principito",
+  "autor": "Antoine de Saint-Exupéry",
+  "isbn": "9780141322568",
+  "categoria": "Ficción",
+  "estado": "disponible"
+}
+
+### Obtener todos
+GET http://127.0.0.1:8000/libros
+
+### Obtener uno
+GET http://127.0.0.1:8000/libros/1
+
+### Actualizar
+PUT http://127.0.0.1:8000/libros/1
+Content-Type: application/json
+
+{
+  "titulo": "El Principito - Edición Especial",
+  "autor": "Antoine de Saint-Exupéry",
+  "isbn": "9780141322568",
+  "categoria": "Ficción",
+  "estado": "prestado"
+}
+
+### Eliminar
+DELETE http://127.0.0.1:8000/libros/1
