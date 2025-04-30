@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.models import Libro
-from tortoise.contrib.fastapi import HTTPNotFoundError, pydantic_model_creator
+from tortoise.contrib.pydantic import pydantic_model_creator  # Cambiado el origen de la importación
 
 router = APIRouter()
 
@@ -18,10 +18,16 @@ async def listar_libros():
 
 @router.get("/libros/{id}")
 async def obtener_libro(id: int):
-    return await Libro_Pydantic.from_queryset_single(Libro.get(id=id))
+    libro = await Libro.get_or_none(id=id)
+    if not libro:
+        raise HTTPException(status_code=404, detail="Libro no encontrado")
+    return await Libro_Pydantic.from_tortoise_orm(libro)
 
 @router.put("/libros/{id}")
 async def actualizar_libro(id: int, libro: LibroIn_Pydantic):
+    libro_obj = await Libro.get_or_none(id=id)
+    if not libro_obj:
+        raise HTTPException(status_code=404, detail="Libro no encontrado")
     await Libro.filter(id=id).update(**libro.dict())
     return await Libro_Pydantic.from_queryset_single(Libro.get(id=id))
 
