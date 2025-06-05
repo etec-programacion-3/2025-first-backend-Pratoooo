@@ -1,32 +1,279 @@
-### Crear libro
-POST http://127.0.0.1:8000/libros
+# ================================================
+# SISTEMA DE GESTIÓN DE BIBLIOTECA - PRUEBAS API
+# Estudiante: Santiago Castiñeira de Dios
+# Curso: 5to Año - Informática
+# Fase 1: Gestión de Libros
+# ================================================
+
+### Variables de configuración
+@baseUrl = http://localhost:5000
+
+# ================================================
+# 1. ENDPOINT DE BIENVENIDA
+# ================================================
+
+### Obtener información del sistema
+GET {{baseUrl}}/
+
+# ================================================
+# 2. GESTIÓN DE LIBROS - CRUD COMPLETO
+# ================================================
+
+### 2.1 Listar todos los libros (inicialmente vacío)
+GET {{baseUrl}}/libros
+
+### 2.2 Crear el primer libro
+POST {{baseUrl}}/libros
 Content-Type: application/json
 
 {
-  "titulo": "El Principito",
-  "autor": "Antoine de Saint-Exupéry",
-  "isbn": "9780141322568",
-  "categoria": "Ficción",
-  "estado": "disponible"
+    "titulo": "Cien años de soledad",
+    "autor": "Gabriel García Márquez",
+    "isbn": "9780307474728",
+    "categoria": "Literatura",
+    "estado": "disponible"
 }
 
-### Obtener todos
-GET http://127.0.0.1:8000/libros
-
-### Obtener uno
-GET http://127.0.0.1:8000/libros/1
-
-### Actualizar
-PUT http://127.0.0.1:8000/libros/1
+### 2.3 Crear un segundo libro
+POST {{baseUrl}}/libros
 Content-Type: application/json
 
 {
-  "titulo": "El Principito - Edición Especial",
-  "autor": "Antoine de Saint-Exupéry",
-  "isbn": "9780141322568",
-  "categoria": "Ficción",
-  "estado": "prestado"
+    "titulo": "1984",
+    "autor": "George Orwell",
+    "isbn": "9780451524935",
+    "categoria": "Distopía",
+    "estado": "disponible"
 }
 
-### Eliminar
-DELETE http://127.0.0.1:8000/libros/1
+### 2.4 Crear un tercer libro (Programación)
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "Python Crash Course",
+    "autor": "Eric Matthes",
+    "isbn": "9781593279288",
+    "categoria": "Programación",
+    "estado": "disponible"
+}
+
+### 2.5 Crear un cuarto libro (Historia)
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "Sapiens: De animales a dioses",
+    "autor": "Yuval Noah Harari",
+    "isbn": "9780062316097",
+    "categoria": "Historia",
+    "estado": "prestado"
+}
+
+### 2.6 Listar todos los libros (ahora con datos)
+GET {{baseUrl}}/libros
+
+### 2.7 Obtener un libro específico (ID 1)
+GET {{baseUrl}}/libros/1
+
+### 2.8 Obtener un libro específico (ID 2)
+GET {{baseUrl}}/libros/2
+
+### 2.9 Obtener un libro que no existe (ID 999)
+GET {{baseUrl}}/libros/999
+
+### 2.10 Actualizar un libro existente (cambiar estado)
+PUT {{baseUrl}}/libros/1
+Content-Type: application/json
+
+{
+    "titulo": "Cien años de soledad",
+    "autor": "Gabriel García Márquez",
+    "isbn": "9780307474728",
+    "categoria": "Literatura",
+    "estado": "prestado"
+}
+
+### 2.11 Actualizar parcialmente un libro (solo estado)
+PUT {{baseUrl}}/libros/2
+Content-Type: application/json
+
+{
+    "titulo": "1984",
+    "autor": "George Orwell",
+    "isbn": "9780451524935",
+    "categoria": "Distopía",
+    "estado": "mantenimiento"
+}
+
+# ================================================
+# 3. BÚSQUEDA Y FILTRADO DE LIBROS
+# ================================================
+
+### 3.1 Buscar por título
+GET {{baseUrl}}/libros/buscar?titulo=1984
+
+### 3.2 Buscar por autor
+GET {{baseUrl}}/libros/buscar?autor=García
+
+### 3.3 Buscar por categoría
+GET {{baseUrl}}/libros/buscar?categoria=Literatura
+
+### 3.4 Buscar por estado
+GET {{baseUrl}}/libros/buscar?estado=disponible
+
+### 3.5 Búsqueda combinada (título y autor)
+GET {{baseUrl}}/libros/buscar?titulo=Python&autor=Eric
+
+### 3.6 Búsqueda combinada (categoría y estado)
+GET {{baseUrl}}/libros/buscar?categoria=Historia&estado=prestado
+
+### 3.7 Búsqueda sin resultados
+GET {{baseUrl}}/libros/buscar?titulo=NoExiste
+
+# ================================================
+# 4. CASOS DE ERROR Y VALIDACIÓN
+# ================================================
+
+### 4.1 Crear libro sin datos (Error 400)
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{}
+
+### 4.2 Crear libro con datos incompletos (Error 400)
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "Libro sin autor"
+}
+
+### 4.3 Crear libro with ISBN inválido (Error 400)
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "Libro con ISBN malo",
+    "autor": "Autor Ejemplo",
+    "isbn": "123",
+    "categoria": "Ejemplo"
+}
+
+### 4.4 Crear libro con ISBN duplicado (Error 409)
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "Libro Duplicado",
+    "autor": "Autor Duplicado",
+    "isbn": "9780307474728",
+    "categoria": "Duplicado"
+}
+
+### 4.5 Crear libro con estado inválido (Error 400)
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "Libro con estado malo",
+    "autor": "Autor Ejemplo",
+    "isbn": "9781234567890",
+    "categoria": "Ejemplo",
+    "estado": "estado_invalido"
+}
+
+### 4.6 Actualizar libro que no existe (Error 404)
+PUT {{baseUrl}}/libros/999
+Content-Type: application/json
+
+{
+    "titulo": "Libro Inexistente",
+    "autor": "Autor Inexistente",
+    "isbn": "9999999999999",
+    "categoria": "Inexistente"
+}
+
+# ================================================
+# 5. OPERACIONES DE ELIMINACIÓN
+# ================================================
+
+### 5.1 Eliminar un libro existente
+DELETE {{baseUrl}}/libros/3
+
+### 5.2 Verificar que el libro fue eliminado
+GET {{baseUrl}}/libros/3
+
+### 5.3 Eliminar un libro que no existe (Error 404)
+DELETE {{baseUrl}}/libros/999
+
+### 5.4 Listar todos los libros después de eliminaciones
+GET {{baseUrl}}/libros
+
+# ================================================
+# 6. ENDPOINTS INEXISTENTES (Error 404)
+# ================================================
+
+### 6.1 Endpoint que no existe
+GET {{baseUrl}}/libros/stats
+
+### 6.2 Método no permitido (Error 405)
+DELETE {{baseUrl}}/libros
+
+# ================================================
+# 7. CASOS DE PRUEBA ADICIONALES
+# ================================================
+
+### 7.1 Crear varios libros para pruebas completas
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "El Quijote",
+    "autor": "Miguel de Cervantes",
+    "isbn": "9788491050285",
+    "categoria": "Clásicos"
+}
+
+### 7.2 Crear libro de programación
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "Clean Code",
+    "autor": "Robert C. Martin",
+    "isbn": "9780132350884",
+    "categoria": "Programación"
+}
+
+### 7.3 Crear libro de ciencias
+POST {{baseUrl}}/libros
+Content-Type: application/json
+
+{
+    "titulo": "Breve historia del tiempo",
+    "autor": "Stephen Hawking",
+    "isbn": "9780553380163",
+    "categoria": "Ciencia"
+}
+
+### 7.4 Búsqueda por término parcial en título
+GET {{baseUrl}}/libros/buscar?titulo=historia
+
+### 7.5 Búsqueda por término parcial en autor
+GET {{baseUrl}}/libros/buscar?autor=Martin
+
+### 7.6 Estado final - listar todos los libros
+GET {{baseUrl}}/libros
+
+# ================================================
+# NOTAS PARA EL DESARROLLADOR:
+# 
+# 1. Ejecutar las pruebas en orden para mejores resultados
+# 2. La base de datos se crea automáticamente al ejecutar la app
+# 3. Estados válidos: disponible, prestado, mantenimiento, perdido
+# 4. El ISBN debe tener exactamente 13 dígitos
+# 5. Todos los campos son requeridos excepto 'estado' (default: disponible)
+# 6. Las búsquedas son case-insensitive
+# 7. Se puede combinar múltiples parámetros de búsqueda
+# ================================================
